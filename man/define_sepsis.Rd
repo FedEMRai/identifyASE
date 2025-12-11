@@ -19,7 +19,7 @@ This function defines sepsis based on the onset of acute organ dysfunction (AOD)
 # Example data frame
 data <- data.frame(
   unique_pt_id = c(1, 1, 1, 2, 2, 2),
-  seqnum = c(12602, 12602, 12602, 18613, 18613, 18613),
+  seqnum = c(1111, 1111, 1111, 2222, 2222, 2222),
   day = c(1, 2, 3, 1, 2, 3),
   aod_any_daily_comm = c(0, 1, 0, 0, 0, 1),
   aod_any_daily_hosp = c(0, 0, 1, 0, 1, 0),

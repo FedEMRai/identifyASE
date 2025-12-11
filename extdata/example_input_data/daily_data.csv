@@ -1,10 +1,9 @@
-"unique_pt_id","seqnum","day","death","ALL_DAYS","bcx_daily","vasop_daily","imv_daily","lact_daily_hi","tbili_daily_hi","tbili_daily_lo","tbili_baseline","creat_daily_hi","creat_daily_lo","creat_baseline","plt_daily_hi","plt_daily_lo","plt_baseline","esrd_icd","new_abx_start","abx_daily"
+unique_pt_id,seqnum,day,death,ALL_DAYS,bcx_daily,vasop_daily,imv_daily,lact_daily_hi,tbili_daily_hi,tbili_daily_lo,tbili_baseline,creat_daily_hi,creat_daily_lo,creat_baseline,plt_daily_hi,plt_daily_lo,plt_baseline,esrd_icd,new_abx_start,abx_daily
 1,12602,0,0,3,1,0,0,1.5,30,30,20,40,40,20,150,150,200,0,0,0
 1,12602,1,0,3,0,1,0,2.5,35,35,20,45,45,20,80,80,200,0,1,1
 1,12602,2,0,3,0,0,1,1.8,40,40,20,50,50,20,90,90,200,0,0,1
-2,18613,0,0,3,0,0,0,1.9,32,32,25,35,35,25,110,110,180,0,0,0
-2,18613,1,1,3,0,0,1,2.1,36,36,25,60,60,25,70,70,180,0,1,1
-2,18613,2,0,3,0,1,0,3,38,38,25,55,55,25,50,50,180,0,0,1
+2,18613,0,0,2,0,0,0,1.9,32,32,25,35,35,25,110,110,180,0,0,0
+2,18613,1,1,2,0,0,1,2.1,36,36,25,60,60,25,70,70,180,0,1,1
 3,54928,0,0,3,1,0,0,1.5,30,30,20,40,40,20,150,150,200,0,0,0
 3,54928,1,0,3,0,1,0,2.5,35,35,20,45,45,20,80,80,200,0,1,1
 3,54928,2,0,3,0,0,1,1.8,40,40,20,50,50,20,90,90,200,0,0,1

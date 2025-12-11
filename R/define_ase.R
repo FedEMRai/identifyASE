@@ -14,34 +14,42 @@
 #' @param lact_hi_cutoff The cutoff value for high lactate levels (default is 2 mmol/L, per the ASE toolkit).
 #' @param plt_lo_cutoff The cutoff value for low platelet counts (default is 100 10^9/L, per the ASE toolkit).
 #' @param plt_lo_hi_ratio The ratio of low to high platelet counts to define hematologic dysfunction (default is 0.5, per the ASE toolkit).
+#' @param ed_inclusion An integer (1–4) specifying how to preprocess the ED rows in daily_data:
+#'   \describe{
+#'     \item{1}{ASE Toolkit default: keep 2 days in ED (i.e., rows with `day > -2`.)}
+#'     \item{2}{Include all ED rows (no filtering).}
+#'     \item{3}{Drop all ED rows (i.e., `day < 1`).}
+#'     \item{4}{Drop ED rows, but if any ED blood culture is detected,
+#'              then force `bcx_daily = 1` on hospital day 1.}
+#'   }
 #' @return A list of sequence numbers of ASE cases categorized by onset type and a data frame containing the data surrounding the blood culture events in the specified window, with additional variables such as indicators for qualifying antimicrobial treatments, the presence of various types of acute organ dysfunctions, and indicators for sepsis onset types.
 #' @examples
 #' # Example daily data frame
 #' daily_data <- data.frame(
-#'   unique_pt_id = c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4),
-#'   seqnum = c(12602, 12602, 12602, 18613, 18613, 18613, 54928, 54928, 54928, 27201, 27201, 27201, 27201, 27201),
-#'   day = c(0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 3, 4),
-#'   death = c(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-#'   ALL_DAYS = c(3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5),
-#'   bcx_daily = c(1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0),
-#'   vasop_daily = c(0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0),
-#'   imv_daily = c(0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1,0, 0),
-#'   lact_daily_hi = c(1.5, 2.5, 1.8, 1.9, 2.1, 3.0, 1.5, 2.5, 1.8, 1.5, 1.9, 2.1, 2.1, 3.0),
-#'   tbili_daily_hi = c(30, 35, 40, 32, 36, 38, 30, 35, 40, 30, 32, 35, 36, 50),
-#'   tbili_daily_lo = c(30, 35, 40, 32, 36, 38, 30, 35, 40, 30, 32, 35, 36, 50),
-#'   tbili_baseline = c(20, 20, 20, 25, 25, 25, 20, 20, 20, 25, 25, 25, 25, 25),
-#'   creat_daily_hi = c(40, 45, 50, 35, 60, 55, 40, 45, 50, 35, 35, 45, 60, 55),
-#'   creat_daily_lo = c(40, 45, 50, 35, 60, 55, 40, 45, 50, 35, 35, 45, 60, 55),
-#'   creat_baseline = c(20, 20, 20, 25, 25, 25, 20, 20, 20, 25, 25, 25, 25, 25),
-#'   plt_daily_hi = c(150, 80, 90, 110, 70, 50, 150, 80, 90, 150, 140, 70, 60, 50),
-#'   plt_daily_lo = c(150, 80, 90, 110, 70, 50, 150, 80, 90, 150, 140, 70, 60, 50),
-#'   plt_baseline = c(200, 200, 200, 180, 180, 180, 200, 200, 200, 180, 180, 180, 180, 180),
-#'   esrd_icd = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-#'   new_abx_start = c(0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0),
-#'   abx_daily = c(0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1)
+#'   unique_pt_id = c(1,1,1, 2,2, 3,3,3, 4,4,4,4,4),
+#'   seqnum       = c(1111,1111,1111, 2222,2222, 3333,3333,3333, 4444,4444,4444,4444,4444),
+#'   day          = c(0,1,2, 0,1, 0,1,2, 0,1,2,3,4),
+#'   death        = c(0,0,0, 0,1, 0,0,0, 0,0,0,0,0),
+#'   ALL_DAYS     = c(3,3,3, 2,2, 3,3,3, 5,5,5,5,5),
+#'   bcx_daily    = c(1,0,0, 0,0, 1,0,0, 0,1,0,0,0),
+#'   vasop_daily  = c(0,1,0, 0,0, 0,1,0, 0,0,1,0,0),
+#'   imv_daily    = c(0,0,1, 0,1, 0,0,1, 0,0,1,0,0),
+#'   lact_daily_hi = c(1.5,2.5,1.8, 1.9,2.1, 1.5,2.5,1.8, 1.5,1.9,2.1,2.1,3.0),
+#'   tbili_daily_hi = c(30,35,40, 32,36, 30,35,40, 30,32,35,36,50),
+#'   tbili_daily_lo = c(30,35,40, 32,36, 30,35,40, 30,32,35,36,50),
+#'   tbili_baseline = c(20,20,20, 25,25, 20,20,20, 25,25,25,25,25),
+#'   creat_daily_hi = c(40,45,50, 35,60, 40,45,50, 35,35,45,60,55),
+#'   creat_daily_lo = c(40,45,50, 35,60, 40,45,50, 35,35,45,60,55),
+#'   creat_baseline = c(20,20,20, 25,25, 20,20,20, 25,25,25,25,25),
+#'   plt_daily_hi   = c(150,80,90, 110,70, 150,80,90, 150,140,70,60,50),
+#'   plt_daily_lo   = c(150,80,90, 110,70, 150,80,90, 150,140,70,60,50),
+#'   plt_baseline   = c(200,200,200, 180,180, 200,200,200, 180,180,180,180,180),
+#'   esrd_icd       = c(0,0,0, 0,0, 0,0,0, 0,0,0,0,0),
+#'   new_abx_start  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
+#'   abx_daily      = c(0,1,1, 0,1, 0,1,1, 0,1,1,1,1)
 #' )
 #' transferout_id <- c(12602,54928,27201)
-#' define_ase(daily_data, transferout_id)
+#' define_ase(daily_data, transferout_id, ed_inclusion = 1)
 #' @import dplyr
 #' @import purrr
 #' @import future
@@ -58,20 +66,16 @@ define_ase <- function(daily_data,
                        tbili_hi_lo_ratio = 2,
                        lact_hi_cutoff = 2,
                        plt_lo_cutoff = 100,
-                       plt_lo_hi_ratio = 0.5) {
+                       plt_lo_hi_ratio = 0.5,
+                       ed_inclusion = 1) {
   
-  ###### Validate the window parameter #########
+  
+  # apply ED data preprocessing before downstream operations
+  daily_data <- process_ed_days(daily_data, ed_inclusion)
+  
+  # validate the window parameter 
   if (!window %in% 1:4) {
     stop("Error: The 'window' parameter must be an integer between 1 and 4.")
-  }
-  
-  ###### Data formatting #########
-  # correct first inpatient day as 1 instead of 0
-  if(min(daily_data$day)==0) {
-    daily_data <- daily_data %>%
-      group_by(unique_pt_id, seqnum) %>%
-      mutate(day=day+1) %>%
-      ungroup()
   }
   
   # select a sub-cohort, e.g., ICU

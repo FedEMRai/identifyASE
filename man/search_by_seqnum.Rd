@@ -20,8 +20,8 @@ This function searches through a list of sliced data and returns the data slices
 \examples{
 # Example sliced_data_list
 sliced_data_list <- list(
-  list(unique_pt_id = 1, seqnum = 12602, data = data.frame(day = 1:3, bcx_daily = c(0, 1, 0))),
-  list(unique_pt_id = 2, seqnum = 18613, data = data.frame(day = 1:3, bcx_daily = c(0, 1, 0)))
+  list(unique_pt_id = 1, seqnum = 1111, data = data.frame(day = 1:3, bcx_daily = c(0, 1, 0))),
+  list(unique_pt_id = 2, seqnum = 2222, data = data.frame(day = 1:3, bcx_daily = c(0, 1, 0)))
 )
-search_by_seqnum(sliced_data_list, 12602)
+search_by_seqnum(sliced_data_list, 1111)
 }

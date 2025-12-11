@@ -17,7 +17,7 @@
 #' # Example data frame
 #' data <- data.frame(
 #'   unique_pt_id = c(1, 1, 1, 2, 2, 2),
-#'   seqnum = c(12602, 12602, 12602, 18613, 18613, 18613),
+#'   seqnum = c(1111, 1111, 1111, 2222, 2222, 2222),
 #'   day = c(1, 2, 3, 1, 2, 3),
 #'   vasop_daily = c(0, 1, 0, 0, 1, 0),
 #'   imv_daily = c(0, 0, 1, 1, 0, 1),

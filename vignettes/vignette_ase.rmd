@@ -80,7 +80,7 @@ library(identifyASE)
 ```
 
 ```{r load-package, echo=FALSE}
-devtools::load_all("/Users/aprilng/Library/CloudStorage/OneDrive-UniversityofCalgary/April_DrLi_Sepsis_Projects/ASE Package/identifyASE")
+#devtools::load_all("/Users/aprilng/Library/CloudStorage/OneDrive-UniversityofCalgary/April_DrLi_Sepsis_Projects/ASE Package/identifyASE")
 ```
 
 ### Dependencies

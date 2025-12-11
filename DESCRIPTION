@@ -8,7 +8,7 @@ Description: Identify adult sepsis events in hospitalized patients using the CDC
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Imports: dplyr, purrr, future, furrr

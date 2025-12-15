@@ -1,6 +1,6 @@
 #' Define Adult Sepsis Events
 #'
-#' This function processes daily patient data, slices data around blood culture days, and sequentially evaluates the ASE toolkit criteria to define adult sepsis events. It allows subgroups selection and acute transfer out indication. 
+#' This function processes daily patient data, slices data around blood culture days, and sequentially evaluates the ASE toolkit criteria to define adult sepsis events. It allows subgroups selection and acute transfer out indication.
 #'
 #' @param daily_data A data frame containing daily patient data with columns `unique_pt_id`, `seqnum`, `day`, `death`, `ALL_DAYS`, and other clinical variables.
 #' @param transferout_id A vector of sequence numbers (`seqnum`) indicating patients who were transferred out to an acute hospital (default is NULL).
@@ -15,12 +15,13 @@
 #' @param plt_lo_cutoff The cutoff value for low platelet counts (default is 100 10^9/L, per the ASE toolkit).
 #' @param plt_lo_hi_ratio The ratio of low to high platelet counts to define hematologic dysfunction (default is 0.5, per the ASE toolkit).
 #' @param ed_inclusion An integer (1–4) specifying how to preprocess the ED rows in daily_data:
-#'   \describe{
-#'     \item{1}{ASE Toolkit default: keep 2 days in ED (i.e., rows with `day > -2`.)}
-#'     \item{2}{Include all ED rows (no filtering).}
-#'     \item{3}{Drop all ED rows (i.e., `day < 1`).}
-#'     \item{4}{Drop ED rows, but if any ED blood culture is detected,
-#'              then force `bcx_daily = 1` on hospital day 1.}
+#'   \itemize{
+#'     \item `1`: ASE Toolkit default — keep 2 days in ED
+#'       (rows with `day > -2`).
+#'     \item `2`: Include all ED rows (no filtering).
+#'     \item `3`: Drop all ED rows (`day < 1`).
+#'     \item `4`: Drop ED rows, but if any ED blood culture is detected,
+#'       force `bcx_daily = 1` on hospital day 1.
 #'   }
 #' @return A list of sequence numbers of ASE cases categorized by onset type and a data frame containing the data surrounding the blood culture events in the specified window, with additional variables such as indicators for qualifying antimicrobial treatments, the presence of various types of acute organ dysfunctions, and indicators for sepsis onset types.
 #' @examples
@@ -45,10 +46,10 @@
 #'   plt_daily_lo   = c(150,80,90, 110,70, 150,80,90, 150,140,70,60,50),
 #'   plt_baseline   = c(200,200,200, 180,180, 200,200,200, 180,180,180,180,180),
 #'   esrd_icd       = c(0,0,0, 0,0, 0,0,0, 0,0,0,0,0),
-#'   new_abx_start  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
-#'   abx_daily      = c(0,1,1, 0,1, 0,1,1, 0,1,1,1,1)
+#'   new_drug_cat  = c(0,1,0, 0,1, 1,0,0, 0,1,0,0,0),
+#'   abx_daily      = c(0,1,1, 0,1, 1,1,1, 0,1,1,1,1)
 #' )
-#' transferout_id <- c(12602,54928,27201)
+#' transferout_id <- c(1111,3333,4444)
 #' define_ase(daily_data, transferout_id, ed_inclusion = 1)
 #' @import dplyr
 #' @import purrr
@@ -73,7 +74,10 @@ define_ase <- function(daily_data,
   # apply ED data preprocessing before downstream operations
   daily_data <- process_ed_days(daily_data, ed_inclusion)
   
-  # validate the window parameter 
+  # define the start of new antimicrobial administration
+  daily_data <- define_new_abx(daily_data)
+  
+  # validate the window parameter
   if (!window %in% 1:4) {
     stop("Error: The 'window' parameter must be an integer between 1 and 4.")
   }
@@ -101,8 +105,8 @@ define_ase <- function(daily_data,
   
   # slice patient daily data around blood culture days
   
-  sliced_data_list <- slice_bcx_data(daily_data, 
-                                     slide_day_before = window, 
+  sliced_data_list <- slice_bcx_data(daily_data,
+                                     slide_day_before = window,
                                      slide_day_after = window + 4)
   
   # Apply add_window_day to each slice in the sliced_data_list; this function is slow

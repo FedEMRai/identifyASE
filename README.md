@@ -27,7 +27,7 @@ If the repository is private:
 
     ```r
     # Replace 'your_personal_access_token' with your GitHub personal access token
-    install_github("FedEMRai/identifyASE", auth_token = "your_personal_access_token")
+    install_github("FedEMRai/identifyASE", auth_token = "your_personal_access_token", build_vignettes = TRUE)
     ```
 
 3. **Load the package**
@@ -48,7 +48,7 @@ If the repository is public:
 2. **Install the package from GitHub**
 
     ```r
-    install_github("FedEMRai/identifyASE")
+    install_github("FedEMRai/identifyASE", build_vignettes = TRUE)
     ```
 
 3. **Load the package**

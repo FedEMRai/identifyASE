@@ -27,7 +27,7 @@ If the repository is private:
 
     ```r
     # Replace 'your_personal_access_token' with your GitHub personal access token
-    install_github("lenaleeca/identifyASE", auth_token = "your_personal_access_token")
+    install_github("FedEMRai/identifyASE", auth_token = "your_personal_access_token")
     ```
 
 3. **Load the package**
@@ -48,7 +48,7 @@ If the repository is public:
 2. **Install the package from GitHub**
 
     ```r
-    install_github("lenaleeca/identifyASE")
+    install_github("FedEMRai/identifyASE")
     ```
 
 3. **Load the package**
@@ -86,16 +86,13 @@ Here is an example of how to identify ASE cases using the main function `define_
 
 ```{r}
 # Get the path to the example data file inside the package
-data_path <- system.file("extdata", "example_input_data", "daily_data.csv", package = "identifyASE")
+data_path <- system.file("extdata", "example_input_data", "daily_data_mock.csv", package = "identifyASE")
 
 # Read the data 
 daily_data <- read.csv(data_path)
 
-transferout_id <- c(12602,54928,27201)
-
-
 # Idenfify Adult Sepsis Events
-result <- define_ase(daily_data = daily_data, transferout_id = transferout_id)
+result <- define_ase(daily_data = daily_data)
 ```
 
 For more detailed information on preparing input data and other package usage, please refer to the vignette.

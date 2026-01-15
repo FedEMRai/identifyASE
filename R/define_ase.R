@@ -3,7 +3,7 @@
 #' This function processes daily patient data, slices data around blood culture days, and sequentially evaluates the ASE toolkit criteria to define adult sepsis events. It allows subgroups selection and acute transfer out indication.
 #'
 #' @param daily_data A data frame containing daily patient data with columns `unique_pt_id`, `seqnum`, `day`, `death`, `ALL_DAYS`, and other clinical variables.
-#' @param transferout_id A vector of sequence numbers (`seqnum`) indicating patients who were transferred out to an acute hospital (default is NULL).
+#' @param transferout_id A vector of sequence numbers (`seqnum`) indicating patients who were transferred out to an acute hospital. If no value, indicate transferout_id = NULL. 
 #' @param cohort_id A list of two vectors: the first vector contains patient IDs (`unique_pt_id`) and the second vector contains sequence numbers (`seqnum`) for selecting a sub-group (default is NULL).
 #' @param abx_days An integer specifying the required number of consecutive antimicrobial days (default is 4 in the absence of death, transfer or discharge, per the ASE toolkit).
 #' @param window An integer specifying the number of calendar days on either side of the date of blood culture collection ie. blood culture window period. Must be an integer between 1 and 4 (default is 2, per the ASE toolkit).
@@ -31,7 +31,7 @@
 #'   package = "identifyASE"
 #' )
 #' daily_data <- read.csv(data_path, stringsAsFactors = FALSE)
-#' define_ase(daily_data, ed_inclusion = 1)
+#' define_ase(daily_data, transferout_id = NULL, ed_inclusion = 1)
 #' @import dplyr
 #' @import purrr
 #' @import future

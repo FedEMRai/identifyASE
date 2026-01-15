@@ -92,7 +92,7 @@ data_path <- system.file("extdata", "example_input_data", "daily_data_mock.csv",
 daily_data <- read.csv(data_path)
 
 # Idenfify Adult Sepsis Events
-result <- define_ase(daily_data = daily_data)
+result <- define_ase(daily_data = daily_data, transferout_id = NULL)
 ```
 
 For more detailed information on preparing input data and other package usage, please refer to the vignette.

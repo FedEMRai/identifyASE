@@ -23,7 +23,7 @@ define_ase(
 \arguments{
 \item{daily_data}{A data frame containing daily patient data with columns \code{unique_pt_id}, \code{seqnum}, \code{day}, \code{death}, \code{ALL_DAYS}, and other clinical variables.}
 
-\item{transferout_id}{A vector of sequence numbers (\code{seqnum}) indicating patients who were transferred out to an acute hospital (default is NULL).}
+\item{transferout_id}{A vector of sequence numbers (\code{seqnum}) indicating patients who were transferred out to an acute hospital. If no value, indicate transferout_id = NULL.}
 
 \item{cohort_id}{A list of two vectors: the first vector contains patient IDs (\code{unique_pt_id}) and the second vector contains sequence numbers (\code{seqnum}) for selecting a sub-group (default is NULL).}
 
@@ -68,5 +68,5 @@ data_path <- system.file(
   package = "identifyASE"
 )
 daily_data <- read.csv(data_path, stringsAsFactors = FALSE)
-define_ase(daily_data, ed_inclusion = 1)
+define_ase(daily_data, transferout_id = NULL, ed_inclusion = 1)
 }

@@ -65,23 +65,20 @@ If the repository is private:
 
 ```{r, eval = FALSE}
 # Replace 'your_personal_access_token' with your GitHub personal access token
-install_github("lenaleeca/identifyASE", auth_token = "your_personal_access_token")
+install_github("FedEMRai/identifyASE", auth_token = "your_personal_access_token")
 ```
 
 If the repository is public:
 
 ```{r, eval = FALSE}
-install_github("lenaleeca/identifyASE")
+install_github("FedEMRai/identifyASE")
 ```
 
 3. Load the package
-```{r}
+```{r, eval = FALSE}
 library(identifyASE)
 ```
 
-```{r load-package, echo=FALSE}
-#devtools::load_all("/Users/aprilng/Library/CloudStorage/OneDrive-UniversityofCalgary/April_DrLi_Sepsis_Projects/ASE Package/identifyASE")
-```
 
 ### Dependencies
 
@@ -100,7 +97,7 @@ install.packages(c("dplyr", "purrr", "future", "furrr", "devtools"),
 								 repos = "https://cran.rstudio.com")
 ```
 
-```{r}
+```{r, eval = FALSE}
 library(dplyr)
 library(purrr)
 library(future)
@@ -112,31 +109,31 @@ library(devtools)
 
 ## Input Data
 
-The input data for this package consists of a dataset containing daily patient-level information during hospitalization. The dataset should include variables such as unique patient and hospitalization identifiers, daily clinical variables (blood culture collection, use of vasopressor and invasive mechanical ventilation, antimicrobial treatments), and laboratory measurements. The data should be sorted within each patient chronologically by the admission date and hospital calendar day. The following table detailed the required variables:
+The input data for this package consists of a dataset containing daily patient-level information during emergency department (ED) stay and hospitalization. The dataset should include variables such as unique patient and hospitalization identifiers, daily clinical variables (blood culture collection, use of vasopressor and invasive mechanical ventilation, antimicrobial treatments), and laboratory measurements. The data should be sorted within each patient chronologically by the admission date and hospital calendar day. The following table detailed the required variables:
 
-| Variable Name     | Description                                               | Variable Calculation and Source   												 |
-|-------------------|-----------------------------------------------------------|------------------------------------------------------------| 
-| `unique_pt_id`    | A unique identifier for each patient.                     | Direct extraction and require de-identification.           |
-| `seqnum`          | Unique hospital visit identification code/number assigned to each visit for each patient.         | Direct extraction and require de-identification.					 |
-| `day`             | Sequential number indicating the hospital day number, starting from 1 for the admission date.     | Direct extraction and require de-identification.					 |
-| `death`           | Binary: 1 = died on that day.                             | Can be extracted from health records.					   					 |
-| `ALL_DAYS`        | Number of calendar days during the hospitalization.       | Can be calculated from health records.					    			 |
-| `bcx_daily`       | Binary: 1 = a blood culture was collected that day.       | Can be extracted from lab test & culture data. Any blood culture collected in the Emergency Department (ED) is assigned to day 1.					   |
-| `vasop_daily`     | Binary: 1 = received a qualifying vasopressor on that day.  | Can be found from medication data. Refer to the CDC Adult Sepsis Event (ASE) Toolkit, page 15 for specific medication names.					             |      
-| `imv_daily`       | Binary: 1 = had invasive mechanical ventilation on that day.| Can be found using procedure codes or ICU data if available.|
-| `lact_daily_hi`   | Highest measured value of serum lactate on that calendar day (mmol/L). | Can be extracted from lab test data.									 |
-| `tbili_daily_hi`  | Highest measured value of total bilirubin on that calendar day (µmol/L). | Can be extracted from lab test data.					       |
-| `tbili_daily_lo`  | Lowest measured value of total bilirubin on that calendar day (µmol/L). | Can be extracted from lab test data.					       |
-| `tbili_basleine`  | Lowest value of total bilirubin measured during the entire hospital stay (µmol/L). | Can be extracted from lab test data.					       |
-| `creat_daily_hi`  | Highest measured value of serum creatinine level on that calendar day (µmol/L).  | Can be extracted from lab test data.					       |
-| `creat_daily_lo`  | Lowest measured value of serum creatinine on that calendar day (µmol/L).  | Can be extracted from lab test data.					       |
-| `creat_baseline`  | Lowest value of serum creatinine measured during the entire hospital stay (µmol/L).  | Can be extracted from lab test data.					       |
-| `plt_daily_hi`    | Highest measured value of platelet count on that calendar day (10^9/L).	| Can be extracted from lab test data.					       |
-| `plt_daily_lo`    | Lowest measured value of platelet count on that calendar day (10^9/L).  | Can be extracted from lab test data.					       |
-| `plt_baseline`    | Highest value of platelet count during the entire hospital stay (10^9/L). | Can be extracted from lab test data.					       |
-| `esrd_icd`        | Binary: 1 = had end-stage renal disease based on ICD-10 codes.   | Calculated based on ICD-10 codes (For example, in Canada we use N18.5, N08.35 and Z99.2).					 |
-| `new_abx_start`   | Binary: 1 = any qualifying antimicrobial was first given on that calendar day.  | Can be found from medication data and calculation/programming is required. Refer to the CDC Adult Sepsis Event (ASE) Toolkit, page 14 for specific antimicrobial names.					 |
-| `abx_daily`       | Binary: 1 = received any qualifying antimicrobial on that calendar day. | Can be found from medication data and calculation/programming is required. Refer to the CDC Adult Sepsis Event (ASE) Toolkit, page 14 for specific antimicrobial names.					 |
+| Variable Name | Description | Variable Calculation and Source |
+|--------------|-------------|---------------------------------|
+| `unique_pt_id` | Unique identifier for each patient.| Direct extraction; requires de-identification. |
+| `seqnum` | Unique hospital visit identifier assigned to each admission for a patient. | Direct extraction; requires de-identification. |
+| `day`   | Sequential hospital day number, where day 1 corresponds to the admission date. Values < 1 represent emergency department (ED) days prior to admission. | Direct extraction; requires de-identification. |
+| `death` | Binary indicator: 1 = patient died on that day.   | Extracted from health records.  |
+| `ALL_DAYS` | Number of calendar days during the hospitalization, excluding ED days.   | Calculated from admission and discharge dates. |
+| `bcx_daily` | Binary indicator: 1 = a blood culture was collected on that day. | Extracted from laboratory data.|
+| `vasop_daily` | Binary indicator: 1 = received a qualifying vasopressor on that day. | Extracted from medication data. Refer to CDC ASE Toolkit (p. 15) for qualifying agents. |
+| `imv_daily` | Binary indicator: 1 = invasive mechanical ventilation on that day. If there was IMV on any ED day, imv_daily = 1 for all ED days. | Identified using procedure codes or ICU data. |
+| `lact_daily_hi` | Highest serum lactate value measured on that calendar day (mmol/L). | Extracted from laboratory data. |
+| `tbili_daily_hi` | Highest total bilirubin value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
+| `tbili_daily_lo` | Lowest total bilirubin value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
+| `tbili_baseline` | Lowest total bilirubin value measured during the entire hospital stay (µmol/L). | Extracted from laboratory data. |
+| `creat_daily_hi` | Highest serum creatinine value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
+| `creat_daily_lo` | Lowest serum creatinine value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
+| `creat_baseline` | Lowest serum creatinine value measured during the entire hospital stay (µmol/L). | Extracted from laboratory data. |
+| `plt_daily_hi` | Highest platelet count measured on that calendar day (10^9/L). | Extracted from laboratory data. |
+| `plt_daily_lo` | Lowest platelet count measured on that calendar day (10^9/L). | Extracted from laboratory data. |
+| `plt_baseline` | Highest platelet count measured during the entire hospital stay (10^9/L). | Extracted from laboratory data. |
+| `esrd_icd` | Binary indicator: 1 = end-stage renal disease identified using ICD-10 codes. | Derived from ICD-10 codes (e.g., N18.5, N08.35, Z99.2 in Canada). |
+| `new_drug_cat` | Binary indicator: 1 = a qualifying antimicrobial was first administered on that day (not given in the prior 2 days). | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
+| `abx_daily` | Binary indicator: 1 = received any qualifying antimicrobial on that day. | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
 
 ### Handling Large Integer Variables 
 
@@ -166,7 +163,7 @@ This function identifies whether an antimicrobial treatment qualifies within the
 This function processes each BCWP and identifies presence of acute organ dysfunction, based on initiation of vasopressors, mechanical ventilation, changes in biomarkers such as serum creatinine, total bilirubin, serum lactate, platelet counts. It compares best lab values to predefined thresholds. It computes two sets of best lab values as outlined on page 9 of the toolkit: one for community-onset AOD using baseline values from the entire hospitalization, and another for hospital-onset AOD using baseline values specific to BCWP. 
 
 ### `define_ase`
-This is the main function users will interact with in the package. By invoking `define_ase`, users automatically trigger the sub-functions listed above and helper functions to sequentially evaluate the ASE toolkit criteria. This function contains parameters for lab measurement thresholds of creatinine, bilirubin, lactate, and platelet counts, as well as the minimum duration of qualifying antimicrobial treatment days. These parameters are preset to align with the ASE toolkit’s criteria but can be customized to align with specific research needs. Additionally, the function includes parameters such as `cohort_id` and `transferout_id`, which allow users to select subgroups and indicate patients who were transferred out to an acute hospital. 
+This is the main function users will interact with in the package. By invoking `define_ase`, users automatically trigger the sub-functions listed above and helper functions to sequentially evaluate the ASE toolkit criteria. This function contains parameters for lab measurement thresholds of creatinine, bilirubin, lactate, and platelet counts, as well as the minimum duration of qualifying antimicrobial treatment days. The function also provides an `ed_inclusion` parameter (integer 1–4) that controls preprocessing of emergency department (ED) days in daily_data, including options to retain or exclude ED data. These parameters are preset to align with the ASE toolkit’s criteria but can be customized to align with specific research needs. Additionally, the function includes parameters such as `cohort_id` and `transferout_id`, which allow users to select subgroups and indicate patients who were transferred out to an acute hospital. 
 
 ### Parameters of `define_ase`
 
@@ -184,26 +181,28 @@ This is the main function users will interact with in the package. By invoking `
 | `lact_hi_cutoff`   | The cutoff value for high lactate levels (default is 2 mmol/L, per the ASE toolkit). |
 | `plt_lo_cutoff`    | The cutoff value for low platelet counts (default is 100 10^9/L, per the ASE toolkit). |
 | `plt_lo_hi_ratio`  | The ratio of low to high platelet counts to define hematologic dysfunction (default is 0.5, per the ASE toolkit). |
+| `ed_inclusion`  | An integer (1–4) specifying how to preprocess the ED rows in daily_data. 1 = ASE Toolkit default — keep 2 days in ED; 2 = Include all ED rows; 3 = Drop all ED rows; 4 = Drop ED rows, but if any ED blood culture is detected, assign `bcx_daily = 1` on hospital day 1. |
 
 ## Example
 
-```{r}
+```{r, eval = FALSE}
 # Get the path to the example data file inside the package
 data_path <- system.file("extdata", "example_input_data", 
-                         "daily_data.csv", package = "identifyASE")
+                         "daily_data_mock.csv", package = "identifyASE")
 
 # Read the data 
 daily_data <- read.csv(data_path)
 
 # Use `transferout_id` to indicate `seqnum` of patients who were transferred 
 # out to an acute hospital
-transferout_id <- c(12602,54928,27201)
+# Example:
+transferout_id <- c(1444)
 
 # Use `cohort_id` to select a subgroup by including 2 vectors: 
 # The first vector contains patient IDs (`unique_pt_id`)  
 # The second vector contains sequence numbers (`seqnum`)
-
-cohort_id <- list(c(1, 2), c(12602, 18613))
+# Example:
+cohort_id <- list(c(2, 3), c(1222, 1333))
 
 # Identify Adult Sepsis Events
 result <- define_ase(daily_data = daily_data, 
@@ -217,7 +216,8 @@ result <- define_ase(daily_data = daily_data,
 										 tbili_hi_lo_ratio = 2,
 										 lact_hi_cutoff = 2,
 										 plt_lo_cutoff = 100,
-										 plt_lo_hi_ratio = 0.5)
+										 plt_lo_hi_ratio = 0.5,
+										 ed_inclusion = 1)
 ```
 
 ## Results
@@ -266,7 +266,7 @@ invisible(
 )
 ```
 
-2. *"Data_(x)days"* includes data of ASE cases surrounding the selected (x) window (1-day,2-day, 3-day or 4-day). For example, if window = 2,  the output will include the dataset "Data_2days". If window = 3,  the output will include the dataset "Data_3days". The following variables are added to the dataset:
+2. *"Data_(x)days"* includes data of ASE cases surrounding the selected (x) window (1-day,2-day, 3-day or 4-day). For example, if window = 2,  the output will include the dataset "Data_2days". If window = 3,  the output will include the dataset "Data_3days". The variables listed below are added to the dataset. The output dataset also contains additional derived variables that are used internally to support ASE case identification and onset classification, but are not exhaustively documented here. 
 
 - **Antimicrobial Qualification**
 	- `abx_qualifying`: Indicates whether the antimicrobial treatment qualifies based on the toolkit criteria.
@@ -295,17 +295,17 @@ The function `search_by_seqnum` is designed to assist subsequent analysis. It al
 
 ### Example
 
-```{r}
+```{r, eval = FALSE}
 # Example sliced_data_list
 sliced_data_list <- list(
-  list(unique_pt_id = 1, seqnum = 12602, data = data.frame(day = 1:3, 
+  list(unique_pt_id = 1, seqnum = 1111, data = data.frame(day = 1:3, 
                                                        bcx_daily = c(0, 1, 0))),
-  list(unique_pt_id = 2, seqnum = 18613, data = data.frame(day = 1:3, 
+  list(unique_pt_id = 2, seqnum = 1222, data = data.frame(day = 1:3, 
                                                        bcx_daily = c(0, 1, 0)))
 )
 
 # Call the function to search for sequence number 12602
-search_by_seqnum(sliced_data_list, 12602)
+search_by_seqnum(sliced_data_list, 1111)
 ```
 
 ---

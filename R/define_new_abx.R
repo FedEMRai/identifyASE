@@ -2,8 +2,7 @@
 #'
 #' This function creates the variable `new_abx_start` to indicate the start of new antimicrobial administration.
 #'
-#' @param daily_data A data frame containing daily patient data with columns `unique_pt_id`, `seqnum`, `day`, `death`, `ALL_DAYS`, `new_drug_cat` and other clinical variables.
-#' @return A modified `daily_data` data frame with variable `new_abx_start` added
+#' @param daily_data A data frame containing daily patient data with columns `unique_pt_id`, `seqnum`, `day`, `death`, `ALL_DAYS`, `new_abx_start` and other clinical variables.
 #' @examples
 #' # Example daily data frame
 #' daily_data <- data.frame(
@@ -26,14 +25,14 @@
 #'   plt_daily_lo   = c(150,80,90, 110,70, 150,80,90, 150,140,70,60,50),
 #'   plt_baseline   = c(200,200,200, 180,180, 200,200,200, 180,180,180,180,180),
 #'   esrd_icd       = c(0,0,0, 0,0, 0,0,0, 0,0,0,0,0),
-#'   new_drug_cat  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
+#'   new_abx_start  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
 #'   abx_daily      = c(0,1,1, 0,1, 0,1,1, 0,1,1,1,1)
 #' )
 #' define_new_abx(daily_data)
 #' @export
 define_new_abx <- function(daily_data) {
   # Check for required columns
-  req <- c("unique_pt_id", "seqnum", "day", "abx_daily", "new_drug_cat")
+  req <- c("unique_pt_id", "seqnum", "day", "abx_daily", "new_abx_start")
   miss <- setdiff(req, names(daily_data))
   if (length(miss) > 0) {
     stop("define_new_abx(): missing required columns: ", paste(miss, collapse = ", "))
@@ -47,8 +46,8 @@ define_new_abx <- function(daily_data) {
     ) %>%
     dplyr::ungroup()
   
-  daily_data$new_abx_start <- daily_data$new_drug_cat  # S4: a new abx drug started
-  daily_data$new_abx_start[is.na(daily_data$new_drug_cat)] <- 0
+  daily_data$new_abx_start <- daily_data$new_abx_start  # S4: a new abx drug started (fill NA values)
+  daily_data$new_abx_start[is.na(daily_data$new_abx_start)] <- 0
   
   daily_data <- daily_data %>%
     dplyr::arrange(unique_pt_id, seqnum, day) %>%

@@ -14,6 +14,27 @@ To install the identifyASE package from GitHub, you need to use the `devtools` p
 
 ### Step-by-Step Installation
 
+If the repository is public:
+
+1. **Install and load `devtools`**
+
+    ```r
+    install.packages("devtools")
+    library(devtools)
+    ```
+
+2. **Install the package from GitHub**
+
+    ```r
+    install_github("FedEMRai/identifyASE", build_vignettes = TRUE)
+    ```
+
+3. **Load the package**
+
+    ```r
+    library(identifyASE)
+    ```
+
 If the repository is private: 
 
 1. **Install and load `devtools`**
@@ -28,27 +49,6 @@ If the repository is private:
     ```r
     # Replace 'your_personal_access_token' with your GitHub personal access token
     install_github("FedEMRai/identifyASE", auth_token = "your_personal_access_token", build_vignettes = TRUE)
-    ```
-
-3. **Load the package**
-
-    ```r
-    library(identifyASE)
-    ```
-
-If the repository is public:
-
-1. **Install and load `devtools`**
-
-    ```r
-    install.packages("devtools")
-    library(devtools)
-    ```
-
-2. **Install the package from GitHub**
-
-    ```r
-    install_github("FedEMRai/identifyASE", build_vignettes = TRUE)
     ```
 
 3. **Load the package**
@@ -111,7 +111,7 @@ browseVignettes("identifyASE")
 
 ## Shiny App
 
-An interactive R Shiny app was developed to enhance accessibility. Users can upload their own data or explore a demo dataset to test the package’s capabilities. Users can interact with the app through simple actions (e.g., clicking buttons or entering inputs) to select subgroups, adjust lab value thresholds, identify ASE cases, and download outputs. Check out the Shiny App [here](https://lenaleeca.shinyapps.io/shiny-identifyase/).
+An interactive R Shiny app was developed to enhance accessibility. Users can upload their own data or explore a mock demo dataset to test the package’s capabilities. Users can interact with the app through simple actions (e.g., clicking buttons or entering inputs) to select subgroups, adjust lab value thresholds, identify ASE cases, and download outputs. Check out the Shiny App [here](https://lenaleeca.shinyapps.io/shiny-identifyase/).
 
 -----
 

@@ -11,7 +11,7 @@ define_ase(
   window = 2,
   abx_days = 4,
   creat_hi_lo_ratio = 2,
-  creat_hi_cutoff = 44,
+  creat_hi_cutoff = NA,
   tbili_hi_cutoff = 34.2,
   tbili_hi_lo_ratio = 2,
   lact_hi_cutoff = 2,
@@ -33,7 +33,7 @@ define_ase(
 
 \item{creat_hi_lo_ratio}{The ratio of high to low creatinine levels to define renal dysfunction (default is 2, per the ASE toolkit).}
 
-\item{creat_hi_cutoff}{The cutoff value for high creatinine levels (default is 44 µmol/L, per the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).}
+\item{creat_hi_cutoff}{The cutoff value for high creatinine levels (default is NA, per the ASE toolkit; however, users may optionally specify a threshold value, such as 44.2 µmol/L from the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).}
 
 \item{tbili_hi_cutoff}{The cutoff value for high bilirubin levels (default is 34.2 µmol/L, per the ASE toolkit).}
 
@@ -47,12 +47,12 @@ define_ase(
 
 \item{ed_inclusion}{An integer (1–4) specifying how to preprocess the ED rows in daily_data:
 \itemize{
-\item \code{1}: ASE Toolkit default — keep 2 days in ED
+\item \code{1}: ASE Toolkit default — include up to 2 ED rows (days) before hospital admission
 (rows with \code{day > -2}).
 \item \code{2}: Include all ED rows (no filtering).
 \item \code{3}: Drop all ED rows (\code{day < 1}).
-\item \code{4}: Drop ED rows, but if any ED blood culture is detected,
-assign \code{bcx_daily = 1} on hospital day 1.
+\item \code{4}: Drop all ED rows, but if any ED blood culture was done,
+assign \code{bcx_daily = 1} on initial hospital day.
 }}
 }
 \value{

@@ -8,7 +8,7 @@
 #' @param abx_days An integer specifying the required number of consecutive antimicrobial days (default is 4 in the absence of death, transfer or discharge, per the ASE toolkit).
 #' @param window An integer specifying the number of calendar days on either side of the date of blood culture collection ie. blood culture window period. Must be an integer between 1 and 4 (default is 2, per the ASE toolkit).
 #' @param creat_hi_lo_ratio The ratio of high to low creatinine levels to define renal dysfunction (default is 2, per the ASE toolkit).
-#' @param creat_hi_cutoff The cutoff value for high creatinine levels (default is 44 µmol/L, per the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).
+#' @param creat_hi_cutoff The cutoff value for high creatinine levels (default is NA, per the ASE toolkit; however, users may optionally specify a threshold value, such as 44.2 µmol/L from the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).
 #' @param tbili_hi_cutoff The cutoff value for high bilirubin levels (default is 34.2 µmol/L, per the ASE toolkit).
 #' @param tbili_hi_lo_ratio The ratio of high to low bilirubin levels to define liver dysfunction (default is 2, per the ASE toolkit).
 #' @param lact_hi_cutoff The cutoff value for high lactate levels (default is 2 mmol/L, per the ASE toolkit).
@@ -16,12 +16,12 @@
 #' @param plt_lo_hi_ratio The ratio of low to high platelet counts to define hematologic dysfunction (default is 0.5, per the ASE toolkit).
 #' @param ed_inclusion An integer (1–4) specifying how to preprocess the ED rows in daily_data:
 #'   \itemize{
-#'     \item `1`: ASE Toolkit default — keep 2 days in ED
+#'     \item `1`: ASE Toolkit default — include up to 2 ED rows (days) before hospital admission
 #'       (rows with `day > -2`).
 #'     \item `2`: Include all ED rows (no filtering).
 #'     \item `3`: Drop all ED rows (`day < 1`).
-#'     \item `4`: Drop ED rows, but if any ED blood culture is detected,
-#'       assign `bcx_daily = 1` on hospital day 1.
+#'     \item `4`: Drop all ED rows, but if any ED blood culture was done,
+#'       assign `bcx_daily = 1` on initial hospital day.
 #'   }
 #' @return A list of sequence numbers of ASE cases categorized by onset type and a data frame containing the data surrounding the blood culture events in the specified window, with additional variables such as indicators for qualifying antimicrobial treatments, the presence of various types of acute organ dysfunctions, and indicators for sepsis onset types.
 #' @examples
@@ -43,7 +43,7 @@ define_ase <- function(daily_data,
                        window = 2,
                        abx_days = 4,
                        creat_hi_lo_ratio = 2,
-                       creat_hi_cutoff = 44.2,
+                       creat_hi_cutoff = NA,
                        tbili_hi_cutoff = 34.2,
                        tbili_hi_lo_ratio = 2,
                        lact_hi_cutoff = 2,

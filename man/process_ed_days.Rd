@@ -10,12 +10,13 @@ process_ed_days(daily_data, ed_inclusion = 1)
 \item{daily_data}{A data frame containing daily patient data with columns \code{unique_pt_id}, \code{seqnum}, \code{day}, \code{death}, \code{ALL_DAYS}, and other clinical variables.}
 
 \item{ed_inclusion}{An integer (1–4) specifying how to preprocess the ED rows in daily_data:
-\describe{
-\item{1}{ASE Toolkit default: keep 2 days in ED (i.e., rows with \code{day > -2}.)}
-\item{2}{Include all ED rows (no filtering).}
-\item{3}{Drop all ED rows (i.e., \code{day < 1}).}
-\item{4}{Drop ED rows, but if any ED blood culture is detected,
-then assign \code{bcx_daily = 1} on hospital day 1.}
+\itemize{
+\item \code{1}: ASE Toolkit default — include up to 2 ED rows (days) before hospital admission
+(rows with \code{day > -2}).
+\item \code{2}: Include all ED rows (no filtering).
+\item \code{3}: Drop all ED rows (\code{day < 1}).
+\item \code{4}: Drop all ED rows, but if any ED blood culture was done,
+assign \code{bcx_daily = 1} on initial hospital day.
 }}
 }
 \value{

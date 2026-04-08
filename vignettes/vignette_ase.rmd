@@ -119,8 +119,8 @@ The input data for this package consists of a dataset containing daily patient-l
 | `death` | Binary indicator: 1 = patient died on that day.   | Extracted from health records.  |
 | `ALL_DAYS` | Number of calendar days during the hospitalization, excluding ED days.   | Calculated from admission and discharge dates. |
 | `bcx_daily` | Binary indicator: 1 = a blood culture was collected on that day. | Extracted from laboratory data.|
-| `vasop_daily` | Binary indicator: 1 = received a qualifying vasopressor on that day. | Extracted from medication data. Refer to CDC ASE Toolkit (p. 15) for qualifying agents. |
-| `imv_daily` | Binary indicator: 1 = invasive mechanical ventilation on that day. If there was IMV on any ED day, imv_daily = 1 for all ED days. | Identified using procedure codes or ICU data. |
+| `vasop_daily` | Binary indicator: 1 = received a qualifying vasopressor by intravenous infusion for any duration during that calendar day. | Extracted from medication data. Refer to CDC ASE Toolkit (p. 15) for qualifying agents. |
+| `imv_daily` | Binary indicator: 1 = had invasive mechanical ventilation for any duration during that calendar day. | Identified using procedure codes or ICU data. |
 | `lact_daily_hi` | Highest serum lactate value measured on that calendar day (mmol/L). | Extracted from laboratory data. |
 | `tbili_daily_hi` | Highest total bilirubin value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
 | `tbili_daily_lo` | Lowest total bilirubin value measured on that calendar day (µmol/L). | Extracted from laboratory data. |
@@ -132,8 +132,8 @@ The input data for this package consists of a dataset containing daily patient-l
 | `plt_daily_lo` | Lowest platelet count measured on that calendar day (10^9/L). | Extracted from laboratory data. |
 | `plt_baseline` | Highest platelet count measured during the entire hospital stay (10^9/L). | Extracted from laboratory data. |
 | `esrd_icd` | Binary indicator: 1 = end-stage renal disease identified using ICD-10 codes. | Derived from ICD-10 codes (e.g., N18.5, N08.35, Z99.2 in Canada). |
-| `new_drug_cat` | Binary indicator: 1 = a qualifying antimicrobial was first administered on that day (not given in the prior 2 days). | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
-| `abx_daily` | Binary indicator: 1 = received any qualifying antimicrobial on that day. | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
+| `new_abx_start` | Binary indicator: 1 = any new qualifying antimicrobial was first administered on that calendar day. | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
+| `abx_daily` | Binary indicator: 1 = received any qualifying antimicrobial on that calendar day. | Derived from medication data. Refer to CDC ASE Toolkit (p. 14). |
 
 ### Handling Large Integer Variables 
 
@@ -163,7 +163,7 @@ This function identifies whether an antimicrobial treatment qualifies within the
 This function processes each BCWP and identifies presence of acute organ dysfunction, based on initiation of vasopressors, mechanical ventilation, changes in biomarkers such as serum creatinine, total bilirubin, serum lactate, platelet counts. It compares best lab values to predefined thresholds. It computes two sets of best lab values as outlined on page 9 of the toolkit: one for community-onset AOD using baseline values from the entire hospitalization, and another for hospital-onset AOD using baseline values specific to BCWP. 
 
 ### `define_ase`
-This is the main function users will interact with in the package. By invoking `define_ase`, users automatically trigger the sub-functions listed above and helper functions to sequentially evaluate the ASE toolkit criteria. This function contains parameters for lab measurement thresholds of creatinine, bilirubin, lactate, and platelet counts, as well as the minimum duration of qualifying antimicrobial treatment days. The function also provides an `ed_inclusion` parameter (integer 1–4) that controls preprocessing of emergency department (ED) days in daily_data, including options to retain or exclude ED data. These parameters are preset to align with the ASE toolkit’s criteria but can be customized to align with specific research needs. Additionally, the function includes parameters such as `cohort_id` and `transferout_id`, which allow users to select subgroups and indicate patients who were transferred out to an acute hospital. 
+This is the main function users will interact with in the package. By invoking `define_ase`, users automatically trigger the sub-functions listed above and helper functions to sequentially evaluate the ASE toolkit criteria. This function contains parameters for lab measurement thresholds of creatinine, bilirubin, lactate, and platelet counts, as well as the minimum duration of qualifying antimicrobial treatment days. The function also provides an `ed_inclusion` parameter (integer 1–4) that controls the preprocessing of emergency department (ED) days in daily_data, including options to retain or exclude ED data. These parameters are preset to align with the ASE toolkit’s criteria but can be customized to align with specific research needs. Additionally, the function includes parameters such as `cohort_id` and `transferout_id`, which allow users to select subgroups and indicate patients who were transferred out to an acute hospital. 
 
 ### Parameters of `define_ase`
 
@@ -175,13 +175,13 @@ This is the main function users will interact with in the package. By invoking `
 | `abx_days`         | Required number of consecutive antimicrobial days (default is 4 in the absence of death, transfer, or discharge, per the ASE toolkit). |
 | `window`           | The number of calendar days on either side of blood culture collection. Must be an integer between 1 and 4 (default is 2, per the ASE toolkit) |
 | `creat_hi_lo_ratio`| The ratio of high to low creatinine levels to define renal dysfunction (default is 2, per the ASE toolkit). |
-| `creat_hi_cutoff`  | The cutoff value for high creatinine levels (default is 44 µmol/L, default is 44 µmol/L, per the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines). |
+| `creat_hi_cutoff`  | The cutoff value for high creatinine levels (default is NA, per the ASE toolkit; however, users may optionally specify a threshold value, such as 44.2 µmol/L from the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines). |
 | `tbili_hi_cutoff`  | The cutoff value for high bilirubin levels (default is 34.2 µmol/L, per the ASE toolkit). |
 | `tbili_hi_lo_ratio`| The ratio of high to low bilirubin levels to define liver dysfunction (default is 2, per the ASE toolkit). |
 | `lact_hi_cutoff`   | The cutoff value for high lactate levels (default is 2 mmol/L, per the ASE toolkit). |
 | `plt_lo_cutoff`    | The cutoff value for low platelet counts (default is 100 10^9/L, per the ASE toolkit). |
 | `plt_lo_hi_ratio`  | The ratio of low to high platelet counts to define hematologic dysfunction (default is 0.5, per the ASE toolkit). |
-| `ed_inclusion`  | An integer (1–4) specifying how to preprocess the ED rows in daily_data. 1 = ASE Toolkit default — keep 2 days in ED; 2 = Include all ED rows; 3 = Drop all ED rows; 4 = Drop ED rows, but if any ED blood culture is detected, assign `bcx_daily = 1` on hospital day 1. |
+| `ed_inclusion`  | An integer (1–4) specifying how to preprocess the ED rows in daily_data. 1 = ASE Toolkit default — include up to 2 ED rows (days) before hospital admission; 2 = Include all ED rows; 3 = Drop all ED rows; 4 = Drop ED rows, but if any ED blood culture was done, assign `bcx_daily = 1` on initial hospital day. |
 
 ## Example
 
@@ -211,7 +211,7 @@ result <- define_ase(daily_data = daily_data,
 										 window = 2,
 										 abx_days = 4,
 										 creat_hi_lo_ratio = 2,
-										 creat_hi_cutoff = 44,
+										 creat_hi_cutoff = NA,
 										 tbili_hi_cutoff = 34.2,
 										 tbili_hi_lo_ratio = 2,
 										 lact_hi_cutoff = 2,
@@ -312,4 +312,4 @@ search_by_seqnum(sliced_data_list, 1111)
 
 ## Shiny App
 
-An interactive R Shiny app was developed to enhance accessibility. Users can upload their own data or explore a demo dataset to test the package’s capabilities. Users can interact with the app through simple actions (e.g., clicking buttons or entering inputs) to select subgroups, adjust lab value thresholds, identify ASE cases, and download outputs. Check out the Shiny App [here](https://lenaleeca.shinyapps.io/shiny-identifyase/).
+An interactive R Shiny app was developed to enhance accessibility. Users can upload their own data or explore a mock demo dataset to test the package’s capabilities. Users can interact with the app through simple actions (e.g., clicking buttons or entering inputs) to select subgroups, adjust lab value thresholds, identify ASE cases, and download outputs. Check out the Shiny App [here](https://lenaleeca.shinyapps.io/shiny-identifyase/).

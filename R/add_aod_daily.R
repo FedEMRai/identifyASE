@@ -6,7 +6,7 @@
 #' @param data A data frame containing patient data with columns `unique_pt_id`, `seqnum`, `day`, `vasop_daily`, `imv_daily`, `lact_daily_hi`, `tbili_daily_hi`, `tbili_baseline`, `creat_daily_hi`, `creat_baseline`, `plt_daily_lo`, `plt_baseline`, and `esrd_icd`.
 #' @param window_day_col A string specifying the name of the column indicating the presence of blood culture days within a specified window.
 #' @param creat_hi_lo_ratio The ratio of high to low creatinine levels to define renal dysfunction (default is 2, per the ASE toolkit).
-#' @param creat_hi_cutoff The cutoff value for high creatinine levels (default is 44 µmol/L, per the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).
+#' @param creat_hi_cutoff The cutoff value for high creatinine levels (default is NA, per the ASE toolkit; however, users may optionally specify a threshold value, such as 44.2 µmol/L from the Risk, Injury, Failure, Loss, and End-stage (RIFLE) renal disease classification system guidelines).
 #' @param tbili_hi_cutoff The cutoff value for high bilirubin levels (default is 34.2 µmol/L, per the ASE toolkit).
 #' @param tbili_hi_lo_ratio The ratio of high to low bilirubin levels to define liver dysfunction (default is 2, per the ASE toolkit).
 #' @param lact_hi_cutoff The cutoff value for high lactate levels (default is 2 mmol/L, per the ASE toolkit).
@@ -40,7 +40,7 @@
 add_aod_daily <- function(data,
                           window_day_col,
                           creat_hi_lo_ratio = 2,
-                          creat_hi_cutoff = 44,
+                          creat_hi_cutoff = NA,
                           tbili_hi_cutoff = 34.2,
                           tbili_hi_lo_ratio = 2,
                           lact_hi_cutoff = 2,
@@ -55,7 +55,7 @@ add_aod_daily <- function(data,
       aod_imv_daily = ifelse(imv_daily == 1 & (lag(imv_daily) == 0 | is.na(lag(imv_daily))), 1, 0),
       aod_lactate_daily = ifelse(lact_daily_hi >= lact_hi_cutoff, 1, 0),
       aod_liver_daily = ifelse(tbili_daily_hi >= tbili_hi_lo_ratio * tbili_baseline & tbili_daily_hi >= tbili_hi_cutoff & tbili_daily_hi >= 0 & tbili_baseline >= 0, 1, 0),
-      aod_renal_daily = ifelse(creat_daily_hi >= creat_hi_lo_ratio * creat_baseline & creat_daily_hi >= creat_hi_cutoff & creat_baseline >= 0 & creat_daily_hi >= 0 & creat_daily_hi >= creat_baseline & esrd_icd != 1, 1, 0),
+      aod_renal_daily = ifelse(creat_daily_hi >= creat_hi_lo_ratio * creat_baseline & (is.na(creat_hi_cutoff) | creat_daily_hi >= creat_hi_cutoff) & creat_baseline >= 0 & creat_daily_hi >= 0 & creat_daily_hi >= creat_baseline & esrd_icd != 1, 1, 0),
       aod_heme_daily = ifelse(plt_baseline >= plt_lo_cutoff & plt_baseline >= 0 & plt_daily_lo < plt_lo_cutoff & plt_daily_lo >= 0 & plt_daily_lo <= plt_lo_hi_ratio * plt_baseline & plt_daily_lo >= 0, 1, 0)
     ) %>%
     mutate(
@@ -79,7 +79,7 @@ add_aod_daily <- function(data,
     ungroup() %>%
     mutate(
       aod_liver_daily_window = ifelse(tbili_daily_hi >= tbili_hi_lo_ratio * tbili_baseline_window & tbili_daily_hi >= tbili_hi_cutoff & tbili_daily_hi >= 0 & tbili_baseline_window >= 0, 1, 0),
-      aod_renal_daily_window = ifelse(creat_daily_hi >= creat_hi_lo_ratio * creat_baseline_window & creat_daily_hi >= 0 & creat_baseline_window >= 0 & creat_daily_hi >= creat_hi_cutoff & creat_daily_hi >= creat_baseline_window & esrd_icd != 1, 1, 0),
+      aod_renal_daily_window = ifelse(creat_daily_hi >= creat_hi_lo_ratio * creat_baseline_window & creat_daily_hi >= 0 & creat_baseline_window >= 0 & (is.na(creat_hi_cutoff) | creat_daily_hi >= creat_hi_cutoff) & creat_daily_hi >= creat_baseline_window & esrd_icd != 1, 1, 0),
       aod_heme_daily_window = ifelse(plt_baseline_window >= plt_lo_cutoff & plt_baseline_window >= 0 & plt_daily_lo < plt_lo_cutoff & plt_daily_lo >= 0 & plt_daily_lo <= plt_lo_hi_ratio * plt_baseline_window & plt_daily_lo >= 0, 1, 0),
       aod_liver_daily_window = replace(aod_liver_daily_window, is.na(aod_liver_daily_window), 0),
       aod_renal_daily_window = replace(aod_renal_daily_window, is.na(aod_renal_daily_window), 0),

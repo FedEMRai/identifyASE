@@ -4,12 +4,13 @@
 #'
 #' @param daily_data A data frame containing daily patient data with columns `unique_pt_id`, `seqnum`, `day`, `death`, `ALL_DAYS`, and other clinical variables.
 #' @param ed_inclusion An integer (1–4) specifying how to preprocess the ED rows in daily_data:
-#'   \describe{
-#'     \item{1}{ASE Toolkit default: keep 2 days in ED (i.e., rows with `day > -2`.)}
-#'     \item{2}{Include all ED rows (no filtering).}
-#'     \item{3}{Drop all ED rows (i.e., `day < 1`).}
-#'     \item{4}{Drop ED rows, but if any ED blood culture is detected,
-#'              then assign `bcx_daily = 1` on hospital day 1.}
+#'   \itemize{
+#'     \item `1`: ASE Toolkit default — include up to 2 ED rows (days) before hospital admission
+#'       (rows with `day > -2`).
+#'     \item `2`: Include all ED rows (no filtering).
+#'     \item `3`: Drop all ED rows (`day < 1`).
+#'     \item `4`: Drop all ED rows, but if any ED blood culture was done,
+#'       assign `bcx_daily = 1` on initial hospital day.
 #'   }
 #' @return A modified `daily_data` data frame with ED rows included or excluded
 #' @examples
@@ -23,23 +24,23 @@
 process_ed_days <- function(daily_data, ed_inclusion = 1) {
   
   if (ed_inclusion == 1) {
-    # ASE Toolkit default: keep only 2 days in ED
+    # ASE Toolkit default: include up to 2 ED rows (days) before hospital admission
     daily_data <- daily_data[daily_data$day > -2, ]
   }
   
   if (ed_inclusion == 2) {
-    # include all ED days
+    # include all ED rows
     return(daily_data)
   }
   
   if (ed_inclusion == 3) {
-    # drop all ED days
+    # drop all ED rows
     daily_data <- daily_data[daily_data$day >= 1, ]
   }
   
   if (ed_inclusion == 4) {
-    # drop all ED days, but:
-    # if any bcx in ED, then force bcx_daily == 1 on day 1
+    # drop all ED rows, but:
+    # if any bcx was done in ED, assign `bcx_daily = 1` on initial hospital day
     
     needed_cols <- c("seqnum", "day", "bcx_daily")
     if (!all(needed_cols %in% names(daily_data))) {

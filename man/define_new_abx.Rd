@@ -7,10 +7,7 @@
 define_new_abx(daily_data)
 }
 \arguments{
-\item{daily_data}{A data frame containing daily patient data with columns \code{unique_pt_id}, \code{seqnum}, \code{day}, \code{death}, \code{ALL_DAYS}, \code{new_drug_cat} and other clinical variables.}
-}
-\value{
-A modified \code{daily_data} data frame with variable \code{new_abx_start} added
+\item{daily_data}{A data frame containing daily patient data with columns \code{unique_pt_id}, \code{seqnum}, \code{day}, \code{death}, \code{ALL_DAYS}, \code{new_abx_start} and other clinical variables.}
 }
 \description{
 This function creates the variable \code{new_abx_start} to indicate the start of new antimicrobial administration.
@@ -37,7 +34,7 @@ daily_data <- data.frame(
   plt_daily_lo   = c(150,80,90, 110,70, 150,80,90, 150,140,70,60,50),
   plt_baseline   = c(200,200,200, 180,180, 200,200,200, 180,180,180,180,180),
   esrd_icd       = c(0,0,0, 0,0, 0,0,0, 0,0,0,0,0),
-  new_drug_cat  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
+  new_abx_start  = c(0,1,0, 0,1, 0,1,0, 0,1,0,0,0),
   abx_daily      = c(0,1,1, 0,1, 0,1,1, 0,1,1,1,1)
 )
 define_new_abx(daily_data)

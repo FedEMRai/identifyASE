@@ -1,4 +1,4 @@
-seqnum,unique_pt_id,day,ALL_DAYS,vasop_daily,abx_daily,bcx_daily,creat_daily_lo,plt_daily_lo,tbili_daily_lo,lact_daily_hi,creat_daily_hi,plt_daily_hi,tbili_daily_hi,imv_daily,death,creat_baseline,tbili_baseline,plt_baseline,esrd_icd,new_drug_cat
+seqnum,unique_pt_id,day,ALL_DAYS,vasop_daily,abx_daily,bcx_daily,creat_daily_lo,plt_daily_lo,tbili_daily_lo,lact_daily_hi,creat_daily_hi,plt_daily_hi,tbili_daily_hi,imv_daily,death,creat_baseline,tbili_baseline,plt_baseline,esrd_icd,new_abx_start
 1111,1,0,NA,0,1,1,93,283,NA,2.4,93,283,NA,0,0,53,9,283,0,1
 1111,1,1,4,0,1,0,126,254,9,3.2,126,254,9,0,0,53,9,283,0,0
 1111,1,2,4,0,1,0,66,242,NA,1.8,66,242,NA,0,0,53,9,283,0,0
